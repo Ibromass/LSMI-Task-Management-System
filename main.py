@@ -1,101 +1,84 @@
 from task_operations import load_tasks, save_tasks, add_task, delete_task
-from task_status import mark_completed, is_overdue, get_overdue_tasks, check_alerts
+from task_status import mark_completed, is_overdue, check_alerts
 from task_utils import parse_datetime, format_datetime, get_current_datetime
 
 def display_tasks(tasks):
     if not tasks:
-        print("\n[!] No tasks on the list.")
+        print("\n[!] No tasks found.")
         return
     
-    print(f"\n--- CURRENT TASKS ({len(tasks)}) ---")
-    
+    print(f"\n--- TASK LIST ({len(tasks)}) ---")
     for i, t in enumerate(tasks):
         dt = parse_datetime(t["deadline"])
         due_str = format_datetime(dt) if dt else t["deadline"]
         
-        # Determine status and label
-        if is_overdue(t):
-            icon, label, info = "🔴", "OVERDUE", f"!! WAS DUE: {due_str} !!"
-        elif t['status'] == "DONE":
-            icon, label, info = "✅", "DONE", ""
+        # Priority Logic: Check if finished first, then check if late
+        if t["status"] == "DONE":
+            icon, status_label = "✅", "DONE"
+        elif is_overdue(t):
+            icon, status_label = "🔴", "OVERDUE"
         else:
-            icon, label = "⏳", "PENDING"
-            # Show "TODAY" if dates match
-            today = get_current_datetime().date()
-            info = f"(Today at {due_str.split()[1]})" if dt and dt.date() == today else f"(Due: {due_str})"
-        
-        print(f"{icon} {i + 1}. [{label}] {t['title']} {info}")
+            icon, status_label = "⏳", "PENDING"
+            
+        print(f"{icon} {i+1}. [{status_label}] {t['title']} (Due: {due_str})")
 
 def main():
-    print("--- STUDENT TASK MANAGER ---")
-    
+    # Initial load and alert check
     tasks = load_tasks()
-    
-    # Quick alert check
     alerts = check_alerts(tasks)
     if alerts:
-        print("\n⚠️  URGENT:")
-        for a in alerts:
-            print(f"  - {a}")
-    
-    while True:
-        print("\n1. Add | 2. View | 3. Complete | 4. Delete | 5. Overdue | 6. Exit")
-        cmd = input("Select: ").strip()
+        print("\n--- URGENT ALERTS ---")
+        for a in alerts: 
+            print(a)
 
-        if cmd == "1":
-            name = input("Enter Task Title: ").strip()
-            print("Format: YYYY-MM-DD HH:MM)")
-            raw_date = input("Enter due date and time: ").strip()     
-            check_dt = parse_datetime(raw_date)
-            if not check_dt:
-                print("Bad format. Try 2026-04-25.")
-                continue
-            
-            add_task(name, raw_date)
-            tasks = load_tasks() # Refresh list
-            print("Task saved successfully.")
-            
-        elif cmd == "2":
+    while True:
+        print("\n1. Add | 2. View | 3. Toggle | 4. Delete | 5. Exit")
+        choice = input("Select: ").strip()
+
+        if choice == "1":
+            name = input("Title: ").strip()
+            date = input("Date (YYYY-MM-DD HH:MM): ").strip()
+            if parse_datetime(date):
+                add_task(name, date)
+                tasks = load_tasks() # Refresh list to include new task
+                print("Task added successfully.")
+            else: 
+                print("Invalid date format. Use YYYY-MM-DD HH:MM")
+                
+        elif choice == "2":
             display_tasks(tasks)
             
-        elif cmd == "3":
+        elif choice == "3":
             display_tasks(tasks)
             if not tasks: continue
             try:
-                idx = int(input("Enter task number to finish: ")) - 1
-                if mark_completed(tasks, idx):
+                idx = int(input("Enter task number to mark as done: ")) - 1
+                if mark_completed(tasks, idx): 
                     save_tasks(tasks)
-                    print(f"Done! Status: {tasks[idx]['status']}")
+                    print("Task status updated successfully.")
                 else:
-                    print("Invalid index.")
-            except (ValueError, IndexError):
-                print("Enter a valid number.")
+                    print("Invalid task number.")
+            except ValueError:
+                print("Please enter a valid number.")
                 
-        elif cmd == "4":
+        elif choice == "4":
             display_tasks(tasks)
             if not tasks: continue
             try:
-                idx = int(input("Enter task number to delete: "))
-                if delete_task(tasks, idx):
-                    tasks = load_tasks() # Sync
-                    print("Task deleted successfully.")
-            except:
-                print("Error deleting task.")
+                idx = int(input("Enter task number to delete: ")) - 1
+                if delete_task(tasks, idx): 
+                    tasks = load_tasks() # Re-sync and re-index tasks
+                    print("Task deleted.")
+                else:
+                    print("Invalid task number.")
+            except ValueError:
+                print("Please enter a valid number.")
                 
-        elif cmd == "5":
-            late = get_overdue_tasks(tasks)
-            if late:
-                print("\nLATE TASKS:")
-                for l in late:
-                    print(f" - {l['title']}")
-            else:
-                print("\nEverything is on time!")
-                
-        elif cmd in ("6", "exit", "quit"):
-            print("See ya.")
+        elif choice == "5":
+            print("Exiting Student Task Manager. Goodbye!")
             break
         else:
-            print("Unknown command.")
+            print("Unknown selection. Please choose 1-5.")
 
 if __name__ == "__main__":
     main()

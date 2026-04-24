@@ -7,11 +7,9 @@ def format_datetime(dt):
     return dt.strftime("%Y-%m-%d %H:%M")
 
 def parse_datetime(d_str):
-    # Check full format first, then date-only
     for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d"):
         try:
             dt = datetime.strptime(d_str, fmt)
-            # Default to end of day if time is missing
             if fmt == "%Y-%m-%d":
                 dt = dt.replace(hour=23, minute=59)
             return dt
