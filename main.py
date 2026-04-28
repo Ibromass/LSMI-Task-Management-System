@@ -7,7 +7,7 @@ def display_tasks(tasks):
         print("\n[!] No tasks found.")
         return
     
-    print(f"\n--- TASK LIST ({len(tasks)}) ---")
+    print(f"\n---Your TASK LIST ({len(tasks)}) ---")
     for i, t in enumerate(tasks):
         dt = parse_datetime(t["deadline"])
         due_str = format_datetime(dt) if dt else t["deadline"]
@@ -32,12 +32,13 @@ def main():
             print(a)
 
     while True:
-        print("\n1. Add | 2. View | 3. Toggle | 4. Delete | 5. Exit")
+        print("\n1. Add a Task | 2. View Tasks | 3. Toggle Task Status | 4. Delete Task | 5. Exit")
         choice = input("Select: ").strip()
 
         if choice == "1":
             name = input("Title: ").strip()
-            date = input("Date (YYYY-MM-DD HH:MM): ").strip()
+            date = input("Due Date (YYYY-MM-DD HH:MM AM/PM): ").strip()
+
             if parse_datetime(date):
                 add_task(name, date)
                 tasks = load_tasks() # Refresh list to include new task

@@ -4,14 +4,12 @@ def get_current_datetime():
     return datetime.now()
 
 def format_datetime(dt):
-    return dt.strftime("%Y-%m-%d %H:%M")
+    return dt.strftime("%Y-%m-%d %I:%M %p")
 
 def parse_datetime(d_str):
-    for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d"):
+    for fmt in ("%Y-%m-%d %I:%M %p", "%Y-%m-%d %H:%M"):
         try:
             dt = datetime.strptime(d_str, fmt)
-            if fmt == "%Y-%m-%d":
-                dt = dt.replace(hour=23, minute=59)
             return dt
         except ValueError:
             continue
@@ -23,8 +21,9 @@ def format_task_line(name, due, is_done):
 
 def parse_task_line(line):
     p = line.strip().split("|")
+    if len(p) < 3: return None 
     return {
         "title": p[0],
         "deadline": p[1],
-        "status": p[2]
+        "status": p[2],
     }

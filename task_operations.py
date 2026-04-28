@@ -9,7 +9,7 @@ def load_tasks():
             for i, line in enumerate(f):
                 if line.strip():
                     t = parse_task_line(line)
-                    t["id"] = i + 1 # Assigns ID for display logic
+                    t["id"] = i + 1 
                     tasks.append(t)
     except FileNotFoundError:
         return []

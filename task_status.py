@@ -3,7 +3,7 @@ from task_utils import parse_datetime, get_current_datetime, format_datetime
 import winsound
 
 def play_alert():
-    winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
+ winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
 
 def mark_completed(tasks, idx):
     if 0 <= idx < len(tasks):
