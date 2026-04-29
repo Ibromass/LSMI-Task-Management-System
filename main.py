@@ -9,9 +9,11 @@ def display_tasks(tasks):
     print(f"\n---Your Task List ({len(tasks)}) ---")
     for i, t in enumerate(tasks):
         dt = parse_datetime(t["deadline"])
-        due_str = format_datetime(dt) if dt else t["deadline"]
-        
-        # Priority Logic: Check if finished first, then check if late
+        if dt:
+            due_str = format_datetime(dt)
+        else:
+           due_str = t["deadline"]
+
         if t["status"] == "DONE":
             icon, status_label = "✅", "DONE"
         elif is_overdue(t):
@@ -22,7 +24,6 @@ def display_tasks(tasks):
         print(f"{icon} {i+1}. [{status_label}] {t['title']} (Due: {due_str})")
 
 def main():
-    # Initial load and alert check
     tasks = load_tasks()
     alerts = check_alerts(tasks)
     if alerts:
@@ -31,16 +32,17 @@ def main():
             print(a)
 
     while True:
+        print("\nWELCOME TO SMART STUDENT TASK MANAGEMENT SYSTEM")
         print("\n1. Add a Task | 2. View Tasks | 3. Update Task Status | 4. Delete Task | 5. Exit")
         choice = input("Select: ").strip()
 
         if choice == "1":
-            name = input("Title: ").strip()
+            name = input("Task Title: ").strip()
             date = input("Due Date (YYYY-MM-DD HH:MM AM/PM): ").strip()
 
             if parse_datetime(date):
                 add_task(name, date)
-                tasks = load_tasks() # Refresh list to include new task
+                tasks = load_tasks() 
                 print("Task added successfully.")
             else: 
                 print("Invalid date format. Use YYYY-MM-DD HH:MM")
@@ -67,7 +69,7 @@ def main():
             try:
                 idx = int(input("Enter task number to delete: ")) - 1
                 if delete_task(tasks, idx): 
-                    tasks = load_tasks() # Re-sync and re-index tasks
+                    tasks = load_tasks() 
                     print("Task deleted.")
                 else:
                     print("Invalid task number.")
