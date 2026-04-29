@@ -4,10 +4,9 @@ from task_utils import parse_datetime, format_datetime, get_current_datetime
 
 def display_tasks(tasks):
     if not tasks:
-        print("\n[!] No tasks found.")
+        print("\nNo tasks found.")
         return
-    
-    print(f"\n---Your TASK LIST ({len(tasks)}) ---")
+    print(f"\n---Your Task List ({len(tasks)}) ---")
     for i, t in enumerate(tasks):
         dt = parse_datetime(t["deadline"])
         due_str = format_datetime(dt) if dt else t["deadline"]
@@ -32,7 +31,7 @@ def main():
             print(a)
 
     while True:
-        print("\n1. Add a Task | 2. View Tasks | 3. Toggle Task Status | 4. Delete Task | 5. Exit")
+        print("\n1. Add a Task | 2. View Tasks | 3. Update Task Status | 4. Delete Task | 5. Exit")
         choice = input("Select: ").strip()
 
         if choice == "1":
